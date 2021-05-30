@@ -18,6 +18,7 @@ const productSchema = new Schema(
     description: { type: String, required: true },
     recipes: { type: String },
     price: { type: Number, required: true },
+    discount: { type: Number, required: true, default: 0 },
     quantity: { type: Number, required: true },
     images: [{ imageUrl: { type: String } }],
     reviewsCount: { type: Number, default: 0 },

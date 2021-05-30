@@ -1,37 +1,32 @@
 const orderController = {};
 const Order = require("../Models/Order");
+const User = require("../Models/User");
 
 orderController.createOrder = async (req, res, next) => {
   try {
     const userId = req.userId;
-    const {
-      productList,
-      billingDetails,
-      statusOrder,
-      paymentMethod,
-      shipmentStatus,
-      shippingFee,
-      totalPrice,
-      discount,
-      totalProduct,
-      paid,
-    } = req.body;
+    const { totalAmount } = req.body;
+    let user = await User.findById(userId).populate({
+      path: "cart",
+      populate: { path: "productId" },
+    });
+    console.log("user", user);
+    const producList = user.cart;
+    console.log("producList", producList);
     let order = await Order.create({
       userId: userId,
-      productList,
-      billingDetails,
-      statusOrder,
-      paymentMethod,
-      shipmentStatus,
-      shippingFee,
-      totalPrice,
-      discount,
-      totalProduct,
-      paid,
+      productList: producList,
+      totalPrice: totalAmount,
     });
+    order.populate("productId").execPopulate();
+    user = await User.findByIdAndUpdate(userId, {
+      cart: [],
+    });
+    console.log("new", user);
     res.status(200).json({
       success: true,
       data: order,
+      message: "Order create Scuccess",
     });
   } catch (err) {
     res.status(400).json({
@@ -42,7 +37,7 @@ orderController.createOrder = async (req, res, next) => {
 };
 
 //Get all order with pagination
-orderController.getAllorders = async (req, res, next) => {
+orderController.getAllOrders = async (req, res, next) => {
   try {
     let { page, limit, sortBy, ...filter } = { ...req.query };
     page = parseInt(page) || 1;
@@ -70,7 +65,7 @@ orderController.getAllorders = async (req, res, next) => {
 };
 
 ///Get single order
-orderController.getSingleorder = async (req, res, next) => {
+orderController.getSingleOrder = async (req, res, next) => {
   try {
     let order = await Order.findById(req.params.id);
     if (!order) {
@@ -82,6 +77,7 @@ orderController.getSingleorder = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: order,
+      message: "Gell single order success",
     });
   } catch (err) {
     res.status(400).json({
@@ -92,35 +88,29 @@ orderController.getSingleorder = async (req, res, next) => {
 };
 
 ///Updateorder.
-orderController.updateorder = async (req, res, next) => {
+orderController.updateOrder = async (req, res, next) => {
   try {
     const userId = req.userId;
     const orderId = req.params.id;
     const {
       productList,
-      billingDetails,
       statusOrder,
-      paymentMethod,
-      shipmentStatus,
       shippingFee,
       totalPrice,
       discount,
       totalProduct,
-      paid,
     } = req.body;
     const order = await Order.findByIdAndUpdate(
       orderId,
       {
         productList,
-        billingDetails,
+
         statusOrder,
-        paymentMethod,
-        shipmentStatus,
+
         shippingFee,
         totalPrice,
         discount,
         totalProduct,
-        paid,
       },
 
       { new: true }
@@ -146,7 +136,7 @@ orderController.updateorder = async (req, res, next) => {
 };
 ///Detelete order
 
-orderController.deleteorder = async (req, res, next) => {
+orderController.deleteOrder = async (req, res, next) => {
   try {
     const userId = req.userId;
     const orderId = req.params.id;

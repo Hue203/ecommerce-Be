@@ -14,7 +14,7 @@ router.post("/", authMiddleware.loginrequired, orderController.createOrder);
  * @description GET list orders with pagination
  * @acces Login required
  */
-router.get("/", authMiddleware.loginrequired, orderController.getAllorders);
+router.get("/", authMiddleware.loginrequired, orderController.getAllOrders);
 
 /**
  * @route GET api/orders/:id
@@ -25,14 +25,14 @@ router.get("/", authMiddleware.loginrequired, orderController.getAllorders);
 router.get(
   "/:id",
   authMiddleware.loginrequired,
-  orderController.getSingleorder
+  orderController.getSingleOrder
 );
 /**
  * @route PUT api/orders/:id
  * @description User, admin update order,
  * @acces Login required
  */
-router.put("/:id", authMiddleware.loginrequired, orderController.updateorder);
+router.put("/:id", authMiddleware.loginrequired, orderController.updateOrder);
 /**
  * @route DELETE api/orders/:id
  * @description User,admin delete/cancel order
@@ -43,7 +43,7 @@ router.delete(
 
   authMiddleware.loginrequired,
   authMiddleware.adminRequired,
-  orderController.deleteorder
+  orderController.deleteOrder
 );
 
 module.exports = router;

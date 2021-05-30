@@ -12,5 +12,21 @@ const reviewSchema = new Schema(
   },
   { timestamps: true }
 );
+
+reviewSchema.statics.calculateReviews = async function (productId) {
+  const reviewCount = await this.find({ porduct: productId }).countDocuments();
+  await Blog.findByIdAndUpdate(productId, { reviewCount: reviewCount });
+};
+reviewSchema.post("save", async function () {
+  await this.constructor.calculateReviews(this.porduct);
+});
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.doc = await this.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function (next) {
+  await this.doc.constructor.calculateReviews(this.doc.porduct);
+});
 const Review = mongoose.model("Review", reviewSchema);
 module.exports = Review;

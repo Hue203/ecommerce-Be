@@ -37,9 +37,9 @@ productController.createProduct = async (req, res, next) => {
       catagories,
       ingredients,
       description,
-
       price,
       quantity,
+
       images,
       service,
     } = req.body;

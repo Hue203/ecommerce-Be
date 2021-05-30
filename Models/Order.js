@@ -9,17 +9,25 @@ const orderSchema = new Schema(
     },
     productList: [
       {
-        product: {
-          name: {
+        productId: {
+          name: { type: String, required: true },
+          catagories: {
             type: String,
             required: true,
+            enum: ["fresh", "dried", "cereal"],
           },
-          price: {
-            type: Number,
+          service: {
+            type: String,
             required: true,
+            enum: ["fixed-drink", "make-your-own"],
+            default: "fixed-drink",
           },
-          productId: { type: Schema.Types.ObjectId }, /// for sort, filter data (bussiness managements)
+
+          price: { type: Number, required: true },
+
+          images: [{ imageUrl: { type: String } }],
         },
+
         quantity: {
           type: Number,
           default: 0,
@@ -27,54 +35,19 @@ const orderSchema = new Schema(
         },
       },
     ],
-
-    billingDetails: {
-      fullname: {
-        type: String,
-        required: true,
-      },
-      address1: {
-        type: String,
-        required: true,
-      },
-      address2: { type: String },
-      phone: {
-        type: String,
-        required: true,
-      },
-      city: {
-        type: String,
-        required: true,
-      },
-      region: {
-        type: String,
-      },
-      zipCode: {
-        type: Number,
-      },
-      country: {
-        type: String,
-        default: "VietNam",
-      },
-    },
     statusOrder: {
       type: String,
-      enum: ["pending", "delivery", "cancel", "paid"],
+      enum: ["pending", "cancel", "delivery", "paid"],
       default: "pending",
       required: true,
     },
     paymentMethod: {
       type: String,
-      emum: ["paypal", "COD"],
+
       required: true,
       default: "COD",
     },
-    shipmentStatus: {
-      type: String,
-      enum: ["processing", "delivered", "return"],
-      required: true,
-      default: "processing",
-    },
+
     shippingFee: {
       type: Number,
       default: 0,
@@ -86,12 +59,10 @@ const orderSchema = new Schema(
     },
     discount: {
       type: Number,
+      default: 0,
     },
     totalProduct: { type: Number, default: 0, required: true },
-    paid: {
-      type: Boolean,
-      default: false,
-    },
+
     isDeleted: {
       type: Boolean,
       default: false,

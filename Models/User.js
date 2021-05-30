@@ -14,8 +14,41 @@ const userSchema = new Schema(
       default: "user",
       enum: ["user", "admin"],
     },
+    cart: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
     balance: { type: String, default: 0 },
     avatarUrl: { type: String },
+    billingDetails: {
+      fullname: {
+        type: String,
+        default: "",
+      },
+      email: {
+        type: String,
+        default: "",
+      },
+      address1: {
+        type: String,
+        default: "",
+      },
+      address2: { type: String },
+      phone: {
+        type: Number,
+        default: "",
+      },
+      city: {
+        type: String,
+
+        default: "",
+      },
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

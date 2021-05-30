@@ -30,6 +30,7 @@ userController.updateProfile = async (req, res, next) => {
     const userId = req.userId;
     const allows = ["name", "password", "avatarUrl"];
     const user = await User.findById(userId);
+    console.log("user?????", user);
     if (!user) {
       throw new Error("Acount not found", "Update proflie Error");
     }
@@ -71,7 +72,7 @@ userController.getUsers = async (req, res, next) => {
       .limit(limit);
     res.status(200).json({
       success: true,
-      data: user,
+      data: { users, totalPages },
       message: `Get users Success`,
     });
   } catch (err) {
@@ -85,8 +86,11 @@ userController.getUsers = async (req, res, next) => {
 userController.getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.userId;
-    console.log("userId", userId);
-    const user = await User.findById(userId);
+
+    const user = await User.findById(userId).populate({
+      path: "cart",
+      populate: { path: "productId" },
+    });
     if (!user) {
       throw new Error("User not found", "Get Current User Error");
     }
@@ -102,9 +106,71 @@ userController.getCurrentUser = async (req, res, next) => {
     });
   }
 };
-userController.getAllUser = async (req, res, next) => {
+userController.updateUserCart = async (req, res, next) => {
   try {
-  } catch (err) {}
+    const userId = req.userId;
+    console.log("userId", userId);
+    const cart = req.body;
+    const user = await User.findById(userId);
+    console.log("user", user);
+    const newUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          cart: cart,
+        },
+      },
+      { new: true }
+    ).populate({
+      path: "cart",
+      populate: { path: "productId" },
+    });
+    console.log("newUser", newUser);
+    res.status(200).json({
+      success: true,
+      data: newUser,
+      message: "Cart Create success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+userController.updateBillingAddress = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const { fullname, email, address1, address2, phone, city } = req.body;
+    console.log("billingDetails", {
+      fullname,
+      email,
+      address1,
+      address2,
+      phone,
+      city,
+    });
+    const user = await User.findById(userId);
+    const newUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        billingDetails: { fullname, email, address1, address2, phone, city },
+      },
+      { new: true }
+    );
+    console.log("newUser", newUser);
+    res.status(200).json({
+      success: true,
+      data: newUser,
+      message: "Billing Address Create success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
 };
 userController.getCurrentUserOrder = async (req, res, next) => {
   try {
@@ -147,42 +213,43 @@ userController.getCurrentUserOrder = async (req, res, next) => {
     });
   }
 };
-userController.paymentUserOder = async (req, res, next) => {
-  try {
-    //get request detail.
-    const orderId = req.params.id;
-    const currentUserId = req.userId;
-    /// find order to pay, get balance
 
-    let order = await Order.findById(orderId);
-    let currentUser = await User.findById(currentUserId);
-    const total = order.total;
-    const funds = currentUser.balance;
-    //check funds
-    if (total > funds) return next(new Error("403 - Insufficient balance"));
+// userController.paymentUserOder = async (req, res, next) => {
+//   try {
+//     //get request detail.
+//     const orderId = req.params.id;
+//     const currentUserId = req.userId;
+//     /// find order to pay, get balance
 
-    // update new balance
-    user = await User.findOneAndUpdate(
-      { _id: currentUserId },
-      { balance: funds - total },
-      { new: true }
-    );
-    //update order
-    order = await Order.findOneAndUpdate(
-      { _id: orderId },
-      { status: "paid" },
-      { new: true }
-    );
-    res.status(200).json({
-      success: true,
-      data: { user, order },
-      message: "Gell all product success",
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      error: err.message,
-    });
-  }
-};
+//     let order = await Order.findById(orderId);
+//     let currentUser = await User.findById(currentUserId);
+//     const total = order.total;
+//     const funds = currentUser.balance;
+//     //check funds
+//     if (total > funds) return next(new Error("403 - Insufficient balance"));
+
+//     // update new balance
+//     user = await User.findOneAndUpdate(
+//       { _id: currentUserId },
+//       { balance: funds - total },
+//       { new: true }
+//     );
+//     //update order
+//     order = await Order.findOneAndUpdate(
+//       { _id: orderId },
+//       { status: "paid" },
+//       { new: true }
+//     );
+//     res.status(200).json({
+//       success: true,
+//       data: { user, order },
+//       message: "Gell all product success",
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       error: err.message,
+//     });
+//   }
+// };
 module.exports = userController;

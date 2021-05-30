@@ -7,6 +7,7 @@ authController.loginWithEmail = async (req, res, next) => {
     ///login process//
     //1. get the email and password from body
     const { email, password } = req.body;
+
     //2. check the email exist in databaes.
     const user = await User.findOne({ email: email });
     if (!user) {
@@ -19,7 +20,7 @@ authController.loginWithEmail = async (req, res, next) => {
     }
     //4. generate token
     const token = await user.generateToken();
-    console.log(token);
+
     //5. response.
     res.status(200).json({
       success: true,
