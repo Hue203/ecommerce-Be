@@ -164,4 +164,41 @@ orderController.deleteOrder = async (req, res, next) => {
     });
   }
 };
+orderController.getCurrentUserOrder = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error("user not found");
+    }
+    let { page, limit, sortBy, ...filter } = { ...req.query };
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+    const totalOrders = await Order.count({ ...filter, isDeleted: false });
+    const totalPages = Math.ceil(totalOrders / limit);
+    const offset = limit * (page - 1);
+    const orders = await Order.find(filter)
+      .find(filter)
+      .sort({ ...sortBy, createdAt: -1 })
+      .skip(offset)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      data: { orders, totalPages },
+      message: "Gell all order success",
+    });
+
+    res.status(200).json({
+      success: true,
+      data: null,
+      message: "order delete success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
 module.exports = orderController;

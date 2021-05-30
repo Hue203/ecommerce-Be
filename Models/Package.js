@@ -14,8 +14,8 @@ const packageSchema = new Schema(
       type: String,
       required: true,
     },
-
-    totalPrice: {
+    quantity: { type: Number, required: true },
+    price: {
       type: Number,
       required: true,
     },

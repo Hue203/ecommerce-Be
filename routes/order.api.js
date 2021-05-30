@@ -15,7 +15,16 @@ router.post("/", authMiddleware.loginrequired, orderController.createOrder);
  * @acces Login required
  */
 router.get("/", authMiddleware.loginrequired, orderController.getAllOrders);
-
+/**
+ * @route GET api/orders/mine
+ * @description GET current user order
+ * @acces Login required
+ */
+router.get(
+  "/mine",
+  authMiddleware.loginrequired,
+  orderController.getCurrentUserOrder
+);
 /**
  * @route GET api/orders/:id
  * @description GET single order
