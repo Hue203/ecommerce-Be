@@ -109,6 +109,6 @@ router.get(
  * @acces Login Required
  
  */
-router.put("/", userController.updateProfile);
+router.put("/", authMiddleware.loginrequired, userController.updateProfile);
 
 module.exports = router;

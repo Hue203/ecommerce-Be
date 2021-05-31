@@ -10,13 +10,18 @@ orderController.createOrder = async (req, res, next) => {
       path: "cart",
       populate: { path: "productId" },
     });
-    console.log("user", user);
-    const producList = user.cart;
-    console.log("producList", producList);
+    const productList = user.cart;
+    console.log("cart", productList);
+    const totalProduct = productList.reduce((total, currentObj) => {
+      console.log("here", currentObj);
+      return total + currentObj.quantity;
+    }, 0);
+    console.log("total", totalProduct);
     let order = await Order.create({
       userId: userId,
-      productList: producList,
+      productList,
       totalPrice: totalAmount,
+      totalProduct,
     });
     order.populate("productId").execPopulate();
     user = await User.findByIdAndUpdate(userId, {
@@ -73,7 +78,7 @@ orderController.getSingleOrder = async (req, res, next) => {
     }
 
     order = order.toJSON();
-
+    console.log("ordersigle", order);
     res.status(200).json({
       success: true,
       data: order,
@@ -177,7 +182,7 @@ orderController.getCurrentUserOrder = async (req, res, next) => {
     const totalOrders = await Order.count({ ...filter, isDeleted: false });
     const totalPages = Math.ceil(totalOrders / limit);
     const offset = limit * (page - 1);
-    const orders = await Order.find(filter)
+    const orders = await Order.find({ ...filter, userId })
       .find(filter)
       .sort({ ...sortBy, createdAt: -1 })
       .skip(offset)

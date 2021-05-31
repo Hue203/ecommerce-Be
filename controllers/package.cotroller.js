@@ -35,7 +35,7 @@ packageController.getAllPackages = async (req, res, next) => {
 
 packageController.createpackage = async (req, res, next) => {
   try {
-    let { name, products, packageType, cycle, totalPrice, images } = req.body;
+    let { name, products, packageType, cycle, price, images } = req.body;
     let package = await Package.findOne({ name: name });
     if (package) {
       throw new Error("package already exists");
@@ -45,7 +45,7 @@ packageController.createpackage = async (req, res, next) => {
       products,
       packageType,
       cycle,
-      totalPrice,
+      price,
       images,
     });
     res.status(200).json({
@@ -90,7 +90,7 @@ packageController.updatepackage = async (req, res, next) => {
   try {
     const userId = req.userId;
     const packageId = req.params.id;
-    const { name, products, packageType, cycle, totalPrice, images } = req.body;
+    const { name, products, packageType, cycle, price, images } = req.body;
     const package = await Package.findOneAndUpdate(
       { _id: packageId },
       {
@@ -98,7 +98,7 @@ packageController.updatepackage = async (req, res, next) => {
         products,
         packageType,
         cycle,
-        totalPrice,
+        price,
         images,
       },
 

@@ -5,7 +5,7 @@ blogController.getAllBlog = async (req, res, next) => {
   try {
     let { page, limit, sortBy, ...filter } = { ...req.query };
     page = parseInt(page) || 1;
-    limit = parseInt(limit) || 10;
+    limit = parseInt(limit) || 1;
     const totalBlogs = await Blog.count({ ...filter, isDeleted: false });
     const totalPages = Math.ceil(totalBlogs / limit);
     const offset = limit * (page - 1);

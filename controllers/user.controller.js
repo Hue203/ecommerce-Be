@@ -28,9 +28,8 @@ userController.register = async (req, res, next) => {
 userController.updateProfile = async (req, res, next) => {
   try {
     const userId = req.userId;
-    const allows = ["name", "password", "avatarUrl"];
+    const allows = ["name", "password", "avatarUrl", "email"]; //req.body = {}, req.body[name]= undefined
     const user = await User.findById(userId);
-    console.log("user?????", user);
     if (!user) {
       throw new Error("Acount not found", "Update proflie Error");
     }
@@ -109,10 +108,8 @@ userController.getCurrentUser = async (req, res, next) => {
 userController.updateUserCart = async (req, res, next) => {
   try {
     const userId = req.userId;
-    console.log("userId", userId);
     const cart = req.body;
     const user = await User.findById(userId);
-    console.log("user", user);
     const newUser = await User.findByIdAndUpdate(
       userId,
       {

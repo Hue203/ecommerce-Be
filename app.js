@@ -8,7 +8,8 @@ const mongoose = require("mongoose");
 const mongoURI = process.env.MONGODB_URI;
 const indexRouter = require("./routes/index");
 const app = express();
-app.use(cors());
+// app.use(cors());
+app.use(cors({ origin: "*" }));
 /* DB connection */
 mongoose
   .connect(mongoURI, {
