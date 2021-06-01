@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
+const Product = require("./Product");
 const reviewSchema = new Schema(
   {
     content: { type: String, required: true },
@@ -15,7 +15,7 @@ const reviewSchema = new Schema(
 
 reviewSchema.statics.calculateReviews = async function (productId) {
   const reviewCount = await this.find({ porduct: productId }).countDocuments();
-  await Blog.findByIdAndUpdate(productId, { reviewCount: reviewCount });
+  await Product.findByIdAndUpdate(productId, { reviewCount: reviewCount });
 };
 reviewSchema.post("save", async function () {
   await this.constructor.calculateReviews(this.porduct);

@@ -1,10 +1,11 @@
 const productController = {};
 const Product = require("../Models/Product");
-
+const Review = require("../Models/Review");
 //Get all product with pagination
 productController.getAllProducts = async (req, res, next) => {
   try {
     let { page, limit, sortBy, ...filter } = { ...req.query };
+    console.log("filter", filter);
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
     const totalProducts = await Product.count({ ...filter, isDeleted: false });
@@ -39,7 +40,6 @@ productController.createProduct = async (req, res, next) => {
       description,
       price,
       quantity,
-
       images,
       service,
     } = req.body;
@@ -49,7 +49,6 @@ productController.createProduct = async (req, res, next) => {
       catagories,
       ingredients,
       description,
-
       price,
       quantity,
       images,
@@ -76,6 +75,7 @@ productController.getSingleProduct = async (req, res, next) => {
     }
 
     product = product.toJSON();
+    product.reviews = await Review.find({ productId: product._id });
 
     res.status(200).json({
       success: true,

@@ -6,8 +6,8 @@ reviewController.createReview = async (req, res, next) => {
   try {
     const userId = req.userId;
     const productId = req.params.id;
+    console.log("productId", productId);
     const { content, vote } = req.body;
-
     const product = Product.findById(productId);
     if (!product) {
       throw new Error("Product not found");
@@ -19,6 +19,7 @@ reviewController.createReview = async (req, res, next) => {
       vote,
     });
     review = await review.populate("user").execPopulate();
+
     res.status(200).json({
       success: true,
       data: review,
@@ -40,13 +41,10 @@ reviewController.getReviewOfProduct = async (req, res, next) => {
     if (!product) {
       throw new Error("Product not found", "get review error");
     }
-    const totalReviews = await Review.count({
-      ...filter,
-      isDeleted: false,
-    });
+    const totalReviews = await Review.countDocuments({ product: productId });
     const totalPages = Math.ceil(totalReviews / limit);
     const offset = limit * (page - 1);
-    const reviews = await Review.find(filter)
+    const reviews = await Review.find({ product: productId })
       .find(filter)
       .sort({ ...sortBy, createdAt: -1 })
       .skip(offset)
