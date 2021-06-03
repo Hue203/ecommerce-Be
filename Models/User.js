@@ -24,7 +24,11 @@ const userSchema = new Schema(
       },
     ],
     balance: { type: String, default: 0 },
-    avatarUrl: { type: String },
+    avatarUrl: {
+      type: String,
+      default:
+        "https://api-private.atlassian.com/users/850ae4c9bf8ca767eb65b41f527f5e3b/avatar",
+    },
     billingDetails: {
       fullname: {
         type: String,
