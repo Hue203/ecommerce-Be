@@ -40,6 +40,52 @@ router.put(
 );
 
 /**
+ * @route PUT api/users/cart/quantity
+ * @description User can add qunatity to cart
+ * @acces Login Required
+ */
+
+router.put(
+  "/cart/quantity",
+  authMiddleware.loginrequired,
+  userController.updateItemCart
+);
+/**
+ * @route PUT api/users/cart/delete
+ * @description User can add qunatity to cart
+ * @acces Login Required
+ */
+
+router.put(
+  "/cart/delete",
+  authMiddleware.loginrequired,
+  userController.deleteItemCart
+);
+
+/**
+ * @route PUT api/users/cart/package
+ * @description User can add package to packagecart
+ * @acces Login Required
+ */
+
+router.put(
+  "/package",
+  authMiddleware.loginrequired,
+  userController.updateUserPackage
+);
+
+/**
+ * @route PUT api/users/package/quantity
+ * @description User can edit quantity package
+ * @acces Login Required
+ */
+
+router.put(
+  "/package/quantity",
+  authMiddleware.loginrequired,
+  userController.updateItemPackage
+);
+/**
  * @route GET api/users/:id/cart
  * @description User can get cart
  * @acces Login Required

@@ -47,7 +47,7 @@ orderController.getAllOrders = async (req, res, next) => {
     let { page, limit, sortBy, ...filter } = { ...req.query };
     page = parseInt(page) || 1;
     limit = parseInt(limit) || 10;
-    console.log("sort", sortBy);
+
     const totalOrders = await Order.count({ ...filter, isDeleted: false });
     const totalPages = Math.ceil(totalOrders / limit);
     const offset = limit * (page - 1);

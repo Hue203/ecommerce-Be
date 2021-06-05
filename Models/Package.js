@@ -30,5 +30,5 @@ const packageSchema = new Schema(
   { timestamps: true }
 );
 
-const Package = mongoose.model("packages", packageSchema);
+const Package = mongoose.model("Packages", packageSchema);
 module.exports = Package;

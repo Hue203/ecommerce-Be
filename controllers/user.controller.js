@@ -1,6 +1,7 @@
 const User = require("../Models/User");
 const userController = {};
 const bcrypt = require("bcryptjs");
+const { remove } = require("../Models/User");
 
 userController.register = async (req, res, next) => {
   try {
@@ -86,10 +87,15 @@ userController.getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.userId;
 
-    const user = await User.findById(userId).populate({
-      path: "cart",
-      populate: { path: "productId" },
-    });
+    const user = await User.findById(userId)
+      .populate({
+        path: "cart",
+        populate: { path: "productId" },
+      })
+      .populate({
+        path: "cartPackage",
+        populate: { path: "packageId" },
+      });
     if (!user) {
       throw new Error("User not found", "Get Current User Error");
     }
@@ -136,6 +142,114 @@ userController.updateUserCart = async (req, res, next) => {
   }
 };
 
+userController.updateItemCart = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    //find user by id
+    let user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+    //findproduct item in cart with prodcutId
+    const { productId, quantity } = req.body;
+
+    //update quantity
+    user.cart.forEach((item) => {
+      if (item.productId.toString() === productId) item.quantity = quantity;
+    });
+
+    await user.save();
+    res.status(200).json({
+      success: true,
+      data: user,
+      message: "Update Cart success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+userController.deleteItemCart = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const { productId } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+    const cart = user.cart.filter(
+      (item) => item.productId.toString() !== productId
+    );
+    user.cart = cart;
+
+    await user.save();
+    res.status(200).json({
+      success: true,
+      data: user,
+      message: "Delete cart success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+userController.updateUserPackage = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    const cartPackage = req.body;
+    const user = await User.findById(userId);
+    const newUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          cartPackage: cartPackage,
+        },
+      },
+      { new: true }
+    ).populate({
+      path: "cartPackage",
+      populate: { path: "packageId" },
+    });
+    console.log("newUser", newUser);
+    res.status(200).json({
+      success: true,
+      data: newUser,
+      message: "Package cart Create success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
+
+userController.updateItemPackage = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    let user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+    const { packageId, quantity } = req.body;
+    console.log("packageId", { packageId, quantity });
+    user.cart.forEach((item) => {
+      if (item.packageId.toString() === packageId) item.quantity = quantity;
+    });
+
+    await user.save();
+    res.status(200).json({
+      success: true,
+      data: user,
+      message: "Update Cart success",
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
 userController.updateBillingAddress = async (req, res, next) => {
   try {
     const userId = req.userId;

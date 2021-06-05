@@ -23,6 +23,16 @@ const userSchema = new Schema(
         quantity: { type: Number, default: 1 },
       },
     ],
+
+    cartPackage: [
+      {
+        packageId: {
+          type: Schema.Types.ObjectId,
+          ref: "Packages",
+        },
+        quantity: { type: Number, default: 1 },
+      },
+    ],
     balance: { type: String, default: 0 },
     avatarUrl: {
       type: String,
