@@ -10,20 +10,20 @@ const orderSchema = new Schema(
     productList: [
       {
         productId: {
-          name: { type: String, required: true },
+          name: { type: String },
           catagories: {
             type: String,
-            required: true,
+
             enum: ["fresh", "dried", "cereal"],
           },
           service: {
             type: String,
-            required: true,
+
             enum: ["fixed-drink", "make-your-own"],
             default: "fixed-drink",
           },
 
-          price: { type: Number, required: true },
+          price: { type: Number },
 
           images: [{ imageUrl: { type: String } }],
         },
@@ -31,10 +31,38 @@ const orderSchema = new Schema(
         quantity: {
           type: Number,
           default: 0,
-          required: true,
         },
       },
     ],
+
+    package: {
+      packageId: {
+        name: { type: String },
+        products: [
+          { productId: { type: Schema.Types.ObjectId, ref: "Product" } },
+        ],
+        images: [{ imageUrl: { type: String } }],
+        packageType: {
+          type: String,
+
+          default: "2 drink/day",
+        },
+      },
+      cycleId: {
+        cycleName: { type: String },
+        price: {
+          type: Number,
+        },
+      },
+      deliveryTime: {
+        type: String,
+
+        enum: ["8am", "10am", "1pm"],
+      },
+      dateStart: {
+        type: String,
+      },
+    },
     statusOrder: {
       type: String,
       enum: ["pending", "cancel", "delivery", "paid"],

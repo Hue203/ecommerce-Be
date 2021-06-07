@@ -24,15 +24,21 @@ const userSchema = new Schema(
       },
     ],
 
-    cartPackage: [
-      {
-        packageId: {
-          type: Schema.Types.ObjectId,
-          ref: "Packages",
-        },
-        quantity: { type: Number, default: 1 },
+    cartPackage: {
+      packageId: {
+        type: Schema.Types.ObjectId,
+        ref: "Packages",
       },
-    ],
+      cylceId: { type: Schema.Types.ObjectId, ref: "Cycle" },
+      deliveryTime: {
+        type: String,
+        enum: ["8am", "10am", "1pm"],
+      },
+      dateStart: {
+        type: String,
+      },
+    },
+
     balance: { type: String, default: 0 },
     avatarUrl: {
       type: String,

@@ -86,6 +86,18 @@ router.put(
   userController.updateItemPackage
 );
 /**
+ * @route PUT api/users/package/quantity
+ * @description User can edit quantity package
+ * @acces Login Required
+ */
+
+router.get(
+  "/package",
+  authMiddleware.loginrequired,
+  userController.getCurrentUser
+);
+
+/**
  * @route GET api/users/:id/cart
  * @description User can get cart
  * @acces Login Required

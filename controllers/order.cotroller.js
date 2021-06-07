@@ -6,26 +6,43 @@ orderController.createOrder = async (req, res, next) => {
   try {
     const userId = req.userId;
     const { totalAmount } = req.body;
-    let user = await User.findById(userId).populate({
-      path: "cart",
-      populate: { path: "productId" },
-    });
+    let user = await User.findById(userId)
+      .populate({
+        path: "cart",
+        populate: { path: "productId" },
+      })
+      .populate({
+        path: "cartPackage",
+        populate: { path: "packageId" },
+      });
+    await user
+      .populate({
+        path: "cartPackage",
+        populate: { path: "cylceId" },
+      })
+      .execPopulate();
+
     const productList = user.cart;
-    console.log("cart", productList);
+
     const totalProduct = productList.reduce((total, currentObj) => {
-      console.log("here", currentObj);
       return total + currentObj.quantity;
     }, 0);
+    if (Object.entries(user.cartPackage).length === 0) {
+      totalProduct += 1;
+    }
+
     console.log("total", totalProduct);
     let order = await Order.create({
       userId: userId,
       productList,
       totalPrice: totalAmount,
       totalProduct,
+      package: user.cartPackage,
     });
     order.populate("productId").execPopulate();
     user = await User.findByIdAndUpdate(userId, {
       cart: [],
+      cartPackage: {},
     });
     console.log("new", user);
     res.status(200).json({

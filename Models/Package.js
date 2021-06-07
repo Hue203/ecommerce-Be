@@ -5,20 +5,13 @@ const packageSchema = new Schema(
   {
     name: { type: String, required: true },
     products: [{ productId: { type: Schema.Types.ObjectId, ref: "Product" } }],
-    images: [{ imageUrl: { type: String, require: true } }],
+    images: [{ imageUrl: { type: String } }],
     packageType: {
       type: String,
       required: true,
+      default: "2 drink/day",
     },
-    cycle: {
-      type: String,
-      required: true,
-    },
-    quantity: { type: Number, required: true },
-    price: {
-      type: Number,
-      required: true,
-    },
+
     reviewsCount: { type: Number, default: 0 },
     voteCount: { type: Number, default: 0 },
     vote_average: { type: Number, default: 0 },

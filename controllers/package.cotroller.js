@@ -1,5 +1,6 @@
 const packageController = {};
 const Package = require("../Models/Package");
+const mongoose = require("mongoose");
 
 //Get all packages
 packageController.getAllPackages = async (req, res, next) => {
@@ -17,7 +18,10 @@ packageController.getAllPackages = async (req, res, next) => {
       .sort({ ...sortBy, createdAt: -1 })
       .skip(offset)
       .limit(limit)
-      .populate("productId");
+      .populate({
+        path: "products",
+        populate: { path: "productId" },
+      });
 
     res.status(200).json({
       success: true,
@@ -35,22 +39,26 @@ packageController.getAllPackages = async (req, res, next) => {
 
 packageController.createpackage = async (req, res, next) => {
   try {
-    let { name, products, packageType, cycle, price, images } = req.body;
-    let package = await Package.findOne({ name: name });
-    if (package) {
-      throw new Error("package already exists");
-    }
-    let newpackage = await Package.create({
+    let { name, product1, product2, images } = req.body;
+    console.log("hahahha", name, product1, product2, images);
+    /*  let p1 = await Product.findById(product1);
+    let p2 = await Product.findById(product2); */
+    let products = [{ productId: product1 }, { productId: product2 }];
+    console.log(typeof products[0].producId);
+    let package = await Package.create({
       name,
-      products,
-      packageType,
-      cycle,
-      price,
+      products: products,
       images,
     });
+    package
+      .populate({
+        path: "products",
+        populate: { path: "productId" },
+      })
+      .execPopulate();
     res.status(200).json({
       success: true,
-      data: newpackage,
+      data: package,
     });
   } catch (err) {
     res.status(400).json({

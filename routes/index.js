@@ -29,3 +29,8 @@ module.exports = router;
 //orderApi
 const orderApi = require("./order.api");
 router.use("/orders", orderApi);
+
+///cycle Api
+
+const cycleApi = require("./cycle.api");
+router.use("/cycles", cycleApi);

@@ -87,7 +87,7 @@ userController.getCurrentUser = async (req, res, next) => {
   try {
     const userId = req.userId;
 
-    const user = await User.findById(userId)
+    let user = await User.findById(userId)
       .populate({
         path: "cart",
         populate: { path: "productId" },
@@ -96,6 +96,12 @@ userController.getCurrentUser = async (req, res, next) => {
         path: "cartPackage",
         populate: { path: "packageId" },
       });
+    await user
+      .populate({
+        path: "cartPackage",
+        populate: { path: "cylceId" },
+      })
+      .execPopulate();
     if (!user) {
       throw new Error("User not found", "Get Current User Error");
     }
@@ -198,13 +204,15 @@ userController.deleteItemCart = async (req, res, next) => {
 userController.updateUserPackage = async (req, res, next) => {
   try {
     const userId = req.userId;
-    const cartPackage = req.body;
-    const user = await User.findById(userId);
+    const { packageId, cylceId, deliveryTime, dateStart } = req.body;
     const newUser = await User.findByIdAndUpdate(
       userId,
       {
-        $push: {
-          cartPackage: cartPackage,
+        cartPackage: {
+          packageId,
+          cylceId,
+          deliveryTime,
+          dateStart,
         },
       },
       { new: true }
@@ -212,6 +220,13 @@ userController.updateUserPackage = async (req, res, next) => {
       path: "cartPackage",
       populate: { path: "packageId" },
     });
+    await newUser
+      .populate({
+        path: "cartPackage",
+        populate: { path: "cylceId" },
+      })
+      .execPopulate();
+
     console.log("newUser", newUser);
     res.status(200).json({
       success: true,
@@ -233,7 +248,7 @@ userController.updateItemPackage = async (req, res, next) => {
     if (!user) throw new Error("User not found");
     const { packageId, quantity } = req.body;
     console.log("packageId", { packageId, quantity });
-    user.cart.forEach((item) => {
+    user.cartPackage.forEach((item) => {
       if (item.packageId.toString() === packageId) item.quantity = quantity;
     });
 
