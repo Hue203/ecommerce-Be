@@ -3,6 +3,20 @@ const router = express.Router();
 const userController = require("../controllers/user.controller");
 const { loginrequired } = require("../middleweares/authentication");
 const authMiddleware = require("../middleweares/authentication");
+
+/**
+ * @route GET api/users/profit
+ * @description profit data
+ * @acces Login Required, admin
+ 
+ */
+router.get(
+  "/profit",
+  authMiddleware.loginrequired,
+  authMiddleware.adminRequired,
+  userController.getProfit
+);
+
 /**
  * @route POST api/users
  * @description User register account
@@ -10,12 +24,25 @@ const authMiddleware = require("../middleweares/authentication");
  *
  */
 router.post("/", userController.register);
+
+/**
+ *  @route GET api/users
+ * @description Return current user infor
+ * @acces Login Required
+ */
+router.get(
+  "/",
+  authMiddleware.loginrequired,
+  authMiddleware.adminRequired,
+  userController.getUsers
+);
 /**
  *  @route GET api/users/me
  * @description Return current user infor
  * @acces Login Required
  */
 router.get("/me", authMiddleware.loginrequired, userController.getCurrentUser);
+
 /**
  * @route PUT api/users/me
  * @description User can update profile

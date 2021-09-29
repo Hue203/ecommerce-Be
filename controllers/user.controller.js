@@ -1,5 +1,6 @@
-const User = require("../Models/User");
 const userController = {};
+const User = require("../Models/User");
+const Order = require("../Models/Order");
 const bcrypt = require("bcryptjs");
 const { remove } = require("../Models/User");
 
@@ -378,4 +379,52 @@ userController.getCurrentUserOrder = async (req, res, next) => {
 //     });
 //   }
 // };
+
+userController.getProfit = async (req, res, next) => {
+  try {
+    const selectedWeek = req.body.selectedWeek;
+    const total = await Order.aggregate([
+      {
+        $addFields: {
+          month: { $month: "$createdAt" },
+        },
+      },
+      {
+        $group: {
+          _id: "$month",
+          totalPrice: { $sum: "$totalPrice" },
+        },
+      },
+      {
+        $addFields: {
+          totalProfit: { $multiply: ["$totalPrice", 0.4] },
+        },
+      },
+    ]);
+
+    let profit = [];
+    let revenue = [];
+    total.forEach((d) => {
+      profit.push(Math.ceil(d.totalProfit));
+      revenue.push(d.totalPrice);
+    });
+
+    res.status(200).json({
+      success: true,
+      data: { profit, revenue },
+      // data: total,
+      message: `total profit`,
+    });
+  } catch (err) {
+    res.status(400).json({
+      success: false,
+      error: err.message,
+    });
+  }
+};
 module.exports = userController;
+
+// {
+//   totalPrice: number,
+//   totalProfit: 60% totalPrice
+// }
